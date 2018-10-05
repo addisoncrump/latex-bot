@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pick a Group</title>
+    <link rel="stylesheet" type="text/css" href="slick/slick.css"/>
+    <link rel="stylesheet" type="text/css" href="slick/slick-theme.css"/>
+    <style>
+        html {
+            height: 100vh;
+        }
+
+        body {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            background-color: rgb(0, 175, 240);
+            margin: 0 auto;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+        }
+
+        .groups {
+            position: fixed;
+            width: 80vw;
+        }
+
+        .blue {
+             color: #fff;
+         }
+
+        .blue h3 {
+            background: #fff;
+            color: #3498db;
+            font-size: 36px;
+            margin: 10px;
+            padding: 2%;
+            text-align: center;
+            height: 100%;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="blue">
+<div class="slider groups">
+</div>
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
+<script type="text/javascript" src="https://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+<script type="text/javascript" src="slick/slick.min.js"></script>
+<script type="application/javascript">
+    let urlParams = new URLSearchParams(window.location.search);
+    let token = urlParams.get("access_token");
+    if (token !== "") {
+        let responses = [];
+        $(".groups").slick(
+            {
+                infinite: true,
+                slidesToShow  : 4,
+                slidesToScroll: 4
+            }
+        );
+        let fetchResponse = function (i) {
+            $.ajax(
+                "https://api.groupme.com/v3/groups?token=" + token + "&page=" + i + "&omit=memberships&token=" + token,
+                {
+                    success: function (data) {
+                        let before = responses.length;
+                        console.log(data);
+                        data.response.forEach(
+                            group => {
+                                responses.push(group);
+                                $(".groups").slick(
+                                    "slickAdd",
+                                    "<div id=\"" + group.id + "\"><h3>" + group.name + "</h3></div>"
+                                );
+                            });
+                        if (before - responses.length !== 0) {
+                            fetchResponse(i + 1);
+                        } else {
+                            $(".slick-slide").on(
+                                "click",
+                                function (e) {
+                                    let slideClicked = $(e.currentTarget).attr("data-slick-index");
+                                    console.log(e.currentTarget);
+                                    console.log(slideClicked);
+                                    console.log(responses[slideClicked]);
+                                    $.ajax({
+                                               method : "POST",
+                                               url    : "https://api.groupme.com/v3/bots" +
+                                                   "?token=" + token +
+                                                   "&bot[name]=LaTeX" +
+                                                   "&bot[group_id]=" + responses[slideClicked].group_id +
+                                                   "&bot[avatar_url]=" + encodeURI("https://i.groupme.com/2400x2400.png.d26f7326928f4f35ba1af10a9228417b") +
+                                                   "&bot[dm_notification]=false",
+                                               success: function (data) {
+                                                   console.log(data);
+                                                   $.ajax({
+                                                              method : "POST",
+                                                              url    : "https://api.groupme.com/v3/bots/" + data.response.bot.bot_id +
+                                                                  "?token=" + token +
+                                                                      "&bot[bot_id]=" + data.response.bot.bot_id +
+                                                                  "&bot[callback_url]=" + encodeURI("https://latex-bot.addisoncrump.info/" + data.response.bot.bot_id),
+                                                              success: function () {
+                                                                  window.location = "https://web.groupme.com/";
+                                                              }
+                                                          }
+                                                   );
+                                               }
+                                           }
+                                    );
+                                }
+                            );
+                        }
+                    }
+                }
+            );
+        };
+        fetchResponse(1);
+    }
+</script>
+</body>
+</html>

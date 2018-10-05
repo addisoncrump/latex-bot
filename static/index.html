@@ -1,1 +1,145 @@
-Oops this doesn't exist yet, rip
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Addison's LaTeX Bot</title>
+    <style id="percent-slider">
+        :root {
+            --percent: 50;
+        }
+    </style>
+    <style>
+        html {
+            height: 100vh;
+        }
+
+        body {
+            background-color: rgba(0, 0, 0, 0);
+            margin: 0 auto;
+            height: 100vh;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .ocean-container-container {
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+        }
+
+        .ocean-container {
+            height: 100vh;
+            width: 100vw;
+            background: radial-gradient(ellipse at center, rgb(238, 238, 238) 0%, rgb(0, 175, 240) 100%);
+            overflow: hidden;
+        }
+
+        .ocean {
+            height: 100%;
+            width: 100%;
+            position: relative;
+            bottom: 0;
+            left: 0;
+        }
+
+        .wave-container {
+            position: relative;
+            height: 100%;
+            width: 200%;
+            display: flex;
+            flex-direction: row;
+            animation: wave 20s cubic-bezier(0.36, 0.45, 0.63, 0.53) infinite;
+            transform: translate3d(0, 0, 0);
+            filter: hue-rotate(0deg);
+        }
+
+        .wave-container:nth-of-type(2) {
+            top: -105%;
+            animation: wave 20s cubic-bezier(0.36, 0.45, 0.63, 0.53) -.125s infinite, swell 20s ease -1.25s infinite;
+            opacity: 1;
+        }
+
+        .wave {
+            position: relative;
+            top: 10%;
+            background: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/85486/wave.svg) no-repeat;
+            background-size: 100% 100%;
+            width: 50%;
+            height: 100%;
+        }
+
+        @keyframes wave {
+            0% {
+                margin-left: 0;
+            }
+            100% {
+                margin-left: -100%;
+            }
+        }
+
+        @keyframes swell {
+            0%, 100% {
+                transform: translate3d(0, -6%, 0);
+            }
+            50% {
+                transform: translate3d(0, 10%, 0);
+            }
+        }
+
+        .text-container {
+            position: relative;
+            top: -100%;
+            height: 100%;
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .text {
+            font-style: normal;
+            font-variant: normal;
+            font-weight: 800;
+            font-stretch: normal;
+            font-size: 10vw;
+            font-family: "Unica One";
+        }
+
+        @font-face {
+            font-family: 'Unica One';
+            font-style: normal;
+            font-weight: 400;
+            src: local('Unica One'), local('UnicaOne-Regular'), url(https://fonts.gstatic.com/s/unicaone/v5/DPEuYwWHyAYGVTSmalsRf93eiEY.woff2) format('woff2');
+            unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+        }
+
+        @font-face {
+            font-family: 'Unica One';
+            font-style: normal;
+            font-weight: 400;
+            src: local('Unica One'), local('UnicaOne-Regular'), url(https://fonts.gstatic.com/s/unicaone/v5/DPEuYwWHyAYGVTSmalsRcd3e.woff2) format('woff2');
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+    </style>
+</head>
+<body onclick="window.location = 'https://oauth.groupme.com/oauth/authorize?client_id=k6n6qjXEpH1usEH4497JsURvweI8njldEHLr5ZmfqScu6BFb'">
+<div class="ocean-container-container">
+    <div class="ocean-container">
+        <div class="ocean">
+            <div class="wave-container">
+                <div class="wave"></div>
+                <div class="wave"></div>
+            </div>
+            <div class="wave-container">
+                <div class="wave"></div>
+                <div class="wave"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="text-container">
+    <span id="current" class="text">ADD LATEX TO GROUPME</span>
+</div>
+</body>
+</html>
