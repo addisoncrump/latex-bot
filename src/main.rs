@@ -14,7 +14,11 @@ extern crate serde_derive;
 extern crate lazy_static;
 
 use groupme_bot::Groupme;
-use std::env;
+use std::string::String;
+use rocket_contrib::Json;
+use regex::Regex;
+use std::path::{Path, PathBuf};
+use rocket::response::NamedFile;
 
 #[derive(Deserialize)]
 pub struct GroupmeCallback {
@@ -22,19 +26,9 @@ pub struct GroupmeCallback {
 }
 
 fn main() {
-//    let token = &env::var("GROUPME_TOKEN").unwrap();
-//    let group_id = &env::var("GROUPME_GROUP").unwrap();
-
-//    let groupme = Groupme::new(Some(token));
-//    let bot = groupme
-//            .create_bot("LaTeX", group_id)
-//            .unwrap()
-//            .with_avatar_url("https://i.groupme.com/2400x2400.png.d26f7326928f4f35ba1af10a9228417b")
-//            .create()
-//            .unwrap();
-
     #[post("/<botid>", format = "application/json", data = "<callback>")]
-    fn index(botid: std::string::String, callback: rocket_contrib::Json<GroupmeCallback>) {let groupme = Groupme::new(None);
+    fn handle_post(botid: String, callback: Json<GroupmeCallback>) {
+        let groupme = Groupme::new(None);
         let bot = groupme.bot(&botid);
         if callback.0.text.starts_with("!latex ") {
             let preamble = "\\usepackage{amsmath}\n\\usepackage{amsfonts}\n\\usepackage{amssymb}\n\\";
@@ -55,17 +49,29 @@ fn main() {
                 .send().unwrap()
                 .text().unwrap();
             lazy_static! {
-                static ref RE: regex::Regex = regex::Regex::new("(http://quicklatex.com/[\\w/\\.]+)").unwrap();
+                static ref RE: Regex = Regex::new("(http://quicklatex.com/[\\w/\\.]+)").unwrap();
             }
             match RE.captures_iter(res.as_str()).last() {
                 Some(link) => {
                     bot.post(&link[0]).unwrap();
                     println!("{}", &link[0])
                 }
-                _ => bot.post(&res).unwrap()
+                _ => bot.post("There was an error interpreting your LaTeX.").unwrap()
             }
         }
     }
 
-    rocket::ignite().mount("/", routes![index]).launch();
+    #[get("/<file..>")]
+    fn static_content(file: PathBuf) -> Option<NamedFile> {
+        NamedFile::open(Path::new("static/").join(file)).ok()
+    }
+
+    #[get("/")]
+    fn index() -> Option<NamedFile> {
+        NamedFile::open(Path::new("static/index.html")).ok()
+    }
+
+    rocket::ignite()
+        .mount("/", routes![handle_post, index, static_content])
+        .launch();
 }
