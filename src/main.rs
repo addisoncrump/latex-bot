@@ -33,13 +33,9 @@ fn main() {
 //            .create()
 //            .unwrap();
 
-    #[post("/", format = "application/json", data = "<callback>")]
-    fn index(callback: rocket_contrib::Json<GroupmeCallback>) {
-        lazy_static! {
-            static ref BOT_ID: std::string::String = env::var("GROUPME_BOTID").unwrap();
-        }
-        let groupme = Groupme::new(None);
-        let bot = groupme.bot(&BOT_ID);
+    #[post("/<botid>", format = "application/json", data = "<callback>")]
+    fn index(botid: std::string::String, callback: rocket_contrib::Json<GroupmeCallback>) {let groupme = Groupme::new(None);
+        let bot = groupme.bot(&botid);
         if callback.0.text.starts_with("!latex ") {
             let preamble = "\\usepackage{amsmath}\n\\usepackage{amsfonts}\n\\usepackage{amssymb}\n\\";
             let mut formula = String::new();
