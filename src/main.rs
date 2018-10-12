@@ -22,7 +22,7 @@ use rocket::response::NamedFile;
 
 #[derive(Deserialize)]
 pub struct GroupmeCallback {
-    text: String
+    text: String,
 }
 
 fn main() {
@@ -31,7 +31,9 @@ fn main() {
         let groupme = Groupme::new(None);
         let bot = groupme.bot(&botid);
         if callback.0.text.starts_with("!latex ") {
-            let preamble = "\\usepackage{amsmath}\n\\usepackage{amsfonts}\n\\usepackage{amssymb}\n\\";
+            let preamble = concat!("\\usepackage{amsmath}\n\\",
+                                   "usepackage{amsfonts}\n\\",
+                                   "usepackage{amssymb}\n\\");
             let mut formula = String::new();
             formula += &callback.0.text[7..];
             formula = formula.replace("%", "%25");
@@ -46,8 +48,10 @@ fn main() {
             let client = reqwest::Client::new();
             let res = client.post("http://www.quicklatex.com/latex3.f")
                 .body(body)
-                .send().unwrap()
-                .text().unwrap();
+                .send()
+                .unwrap()
+                .text()
+                .unwrap();
             lazy_static! {
                 static ref RE: Regex = Regex::new("(http://quicklatex.com/[\\w/\\.]+)").unwrap();
             }
@@ -56,7 +60,7 @@ fn main() {
                     bot.post(&link[0]).unwrap();
                     println!("{}", &link[0])
                 }
-                _ => bot.post("There was an error interpreting your LaTeX.").unwrap()
+                _ => bot.post("There was an error interpreting your LaTeX.").unwrap(),
             }
         }
     }
@@ -71,7 +75,5 @@ fn main() {
         NamedFile::open(Path::new("static/index.html")).ok()
     }
 
-    rocket::ignite()
-        .mount("/", routes![handle_post, index, static_content])
-        .launch();
+    rocket::ignite().mount("/", routes![handle_post, index, static_content]).launch();
 }
