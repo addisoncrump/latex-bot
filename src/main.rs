@@ -31,9 +31,9 @@ fn main() {
         let groupme = Groupme::new(None);
         let bot = groupme.bot(&botid);
         if callback.0.text.starts_with("!latex ") {
-            let preamble = concat!("\\usepackage{amsmath}\n",
-                                   "\\usepackage{amsfonts}\n",
-                                   "\\usepackage{amssymb}\n\\");
+            let preamble = concat!("\\usepackage{amsmath}\n\\",
+                                   "usepackage{amsfonts}\n\\",
+                                   "usepackage{amssymb}\n\\");
             let mut formula = String::new();
             formula += &callback.0.text[7..];
             formula = formula.replace("%", "%25");
